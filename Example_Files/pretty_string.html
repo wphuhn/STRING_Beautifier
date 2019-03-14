@@ -1,0 +1,265 @@
+
+          <!doctype html>
+          <html>
+          <head>
+            <title></title>
+            
+        
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.2/d3.min.js" type="text/javascript"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.js"></script>
+    
+        <style type="text/css">
+        
+    #mynetwork0 {
+      width: 900px;
+      height: 800px;
+      border: 5px solid white;
+      box-sizing: border-box;
+    }
+    
+        </style>
+        <script type="text/javascript">
+        
+        
+    function runVis(visNodes, visEdges) {
+       var vizOptions = {
+          configure: {
+            enabled: false,
+            filter: 'nodes,edges',
+            container: undefined,
+            showButton: false
+          },
+          edges:{
+            arrows: {
+               to:     {enabled: false, scaleFactor:1},
+               middle:   {enabled: false, scaleFactor:1},
+               from: {enabled: false, scaleFactor:1}
+            },
+            arrowStrikethrough: true,
+            color: {
+               color: '#848484',
+               highlight: '#848484',
+               hover: '#848484',
+               inherit: 'from',
+               opacity: 1.0
+            },
+            dashes: false,
+            font: {
+                color: '#343434',
+                size: 20*1,
+                face: 'ariel',
+                background: 'rgba(0,0,0,0)',
+                strokeWidth: 0,
+                strokeColor: '#343434',
+                align:'horizontal'
+            },
+            hoverWidth: 0.5,
+            labelHighlightBold: true,
+            length: undefined,
+            scaling:{
+               min: 1,
+               max: 15,
+               label: {
+                  enabled: false,
+                  min: 14,
+                  max: 30*1,
+                  maxVisible: 30*1,
+                  drawThreshold: 5,
+               }
+            },
+            selectionWidth: 1,
+            selfReferenceSize: 10,
+            shadow:{
+               enabled: false,
+               color: 'rgba(0,0,0,0.5)',
+               size: 10,
+               x: 5,
+               y: 5
+            },
+            smooth: {
+               enabled: false,
+               type: 'dynamic',
+               forceDirection: 'none',
+               roundness: 0.5
+            },
+            width: 1*1,
+          },
+          interaction:{
+            dragNodes: true,
+            dragView: true,
+            hideEdgesOnDrag: false,
+            hideNodesOnDrag: false,
+            hover: true,
+            hoverConnectedEdges: true,
+            keyboard: {
+                enabled: false,
+                speed: {x: 10, y: 10, zoom: 0.02},
+                bindToWindow: true
+            },
+            multiselect: false,
+            navigationButtons: false,
+            selectable: true,
+            selectConnectedEdges: true,
+            tooltipDelay: 300,
+            zoomView: true
+          },
+          layout: {
+            improvedLayout:true,
+            hierarchical: {
+                enabled:false,
+                levelSeparation: 150,
+                direction: 'UD',
+                sortMethod: 'hubsize'
+            },
+            randomSeed: 780555
+          },
+          nodes: {
+              borderWidth: 2,
+              borderWidthSelected: 2,
+              brokenImage: 'undefined',
+              color: {
+                 border: 'black',
+                 highlight: {
+                    background: 'orange',
+                    border: '#2B7CE9'
+                 },
+                 hover: {
+                    background: 'orange',
+                    border: '#2B7CE9'
+                 }
+              },
+              font: {
+                 color: '#343434',
+                 size: 14*1,
+                 face: 'arial',
+                 background: 'rgba(0,0,0,0)',
+                 strokeWidth: 0,
+                 strokeColor: '#ffffff',
+                 align: 'center'
+              },
+              icon: {
+                 face: 'FontAwesome',
+                 code: undefined,
+                 size: 50,
+                 color:'#2B7CE9'
+              },
+              image: {
+                 unselected: 'undefined',
+                 selected: 'undefined'
+              },
+              labelHighlightBold: true,
+              scaling: {
+                 min: 10,
+                 max: 30,
+                 label: {
+                     enabled: false,
+                     min: 14,
+                     max: 30*1,
+                     maxVisible: 30*1,
+                     drawThreshold: 5
+                 }
+              },
+              shadow:{
+                 enabled: true,
+                 color: 'rgba(0,0,0,0.5)',
+                 size:10,
+                 x: 5,
+                 y: 5
+              },
+              shapeProperties: {
+                 borderDashes: false, // only for borders
+                 borderRadius: 6,     // only for box shape
+                 interpolation: true,  // only for image and circularImage shapes
+                 useImageSize: false,  // only for image and circularImage shapes
+                 useBorderWithImage: false  // only for image shape
+              }
+          },
+         physics: {
+            enabled: false,
+            stabilization: false,
+            barnesHut: {gravitationalConstant: -8000, springConstant: 0.012, springLength: 100},
+            maxVelocity: 8,
+            minVelocity: 2,
+            solver: 'barnesHut',
+            adaptiveTimestep: true,
+            stabilization: {
+              enabled: true,
+              iterations: 1000,
+              updateInterval: 100,
+              onlyDynamicEdges: false,
+              fit: true
+            }
+          }
+       };
+       var python_nodes = visNodes;
+       var nodeArray = [];
+       for(var i=0; i<python_nodes.length; i++){
+         var node_degree = python_nodes[i].degree > 30 ? 30 + ((python_nodes[i].degree - 30)/6) : python_nodes[i].degree;
+         node_degree = node_degree < 10 ? 10 : node_degree;
+         var font_size = python_nodes[i].degree * 2;
+         font_size = font_size < 10 ? 10 : font_size;
+         nodeArray.push({id: i,
+                         label: python_nodes[i].node_label,
+                         borderWidth: python_nodes[i].border_width * 1,
+                         borderWidthSelected: 2,
+                         color: {
+                             background: python_nodes[i].color,
+                             border: python_nodes[i].border_color,
+                             hover: {
+                                border: python_nodes[i].border_color_hover,
+                             },
+                         },
+                         title: python_nodes[i].title,
+                         shape: python_nodes[i].node_shape,
+                         size: Math.sqrt(python_nodes[i].degree)*6*1,
+                         x: python_nodes[i].x * 1,
+                         y: python_nodes[i].y * 1});
+         }
+       var python_edges = visEdges;
+       var edgeArray = [];
+       for(var i=0; i<python_edges.length; i++){
+         edgeArray.push({from: python_edges[i].source,
+                         to: python_edges[i].target,
+                         label: python_edges[i].id,
+                         title: python_edges[i].id,
+                         color: {
+                            color: python_edges[i].color,
+                            opacity: 1.0
+                        },
+                         width: null
+            });
+       }
+       //console.log(nodeArray);
+       //console.log(edgeArray);
+       var vis_nodes = new vis.DataSet(nodeArray);
+       var vis_edges = new vis.DataSet(edgeArray);
+
+        var container = document.getElementById('mynetwork0');
+        var data = {
+            edges: vis_edges,
+            nodes: vis_nodes
+        };
+        var options = {};
+        var myNetwork = new vis.Network(container, data, vizOptions);
+
+        myNetwork.fit();
+
+
+       console.log( "ready!" );
+    }
+    
+        function setUpFrame() {
+          window.runVis([{"cluster": "1", "degree": 3, "x": 526.2162162162161, "color": "Red", "node_shape": "dot", "node_label": "SF3B1", "id": 0, "y": 89.8127925117006, "border_width": 0, "title": 0}, {"cluster": "1", "degree": 1, "x": 468.3590733590736, "color": "Red", "node_shape": "dot", "node_label": "CHN1", "id": 1, "y": 266.7238689547584, "border_width": 0, "title": 1}, {"cluster": "3", "degree": 4, "x": 80.03861003860979, "color": "Green", "node_shape": "dot", "node_label": "LAMB2", "id": 2, "y": 222.9173166926676, "border_width": 0, "title": 2}, {"cluster": "1", "degree": 1, "x": 205.6563706563708, "color": "Red", "node_shape": "dot", "node_label": "ATP1B3", "id": 3, "y": 107.50390015600621, "border_width": 0, "title": 3}, {"cluster": "1", "degree": 5, "x": 494.42084942084944, "color": "Red", "node_shape": "dot", "node_label": "PRPF19", "id": 4, "y": 152.1528861154446, "border_width": 0, "title": 4}, {"cluster": "1", "degree": 4, "x": 205.13513513513522, "color": "Red", "node_shape": "dot", "node_label": "NACA", "id": 5, "y": 343.38533541341644, "border_width": 0, "title": 5}, {"cluster": "1", "degree": 2, "x": 265.0772200772202, "color": "Red", "node_shape": "dot", "node_label": "BUB1", "id": 6, "y": 142.886115444618, "border_width": 0, "title": 6}, {"cluster": "4", "degree": 3, "x": 375.5791505791506, "color": "Blue", "node_shape": "dot", "node_label": "NUP153", "id": 7, "y": 427.6287051482058, "border_width": 0, "title": 7}, {"cluster": "1", "degree": 2, "x": 290.6177606177604, "color": "Red", "node_shape": "dot", "node_label": "NDUFB8", "id": 8, "y": 195.9594383775354, "border_width": 0, "title": 8}, {"cluster": "2", "degree": 8, "x": 401.11969111969137, "color": "Yellow", "node_shape": "dot", "node_label": "DDX47", "id": 9, "y": 279.3603744149766, "border_width": 0, "title": 9}, {"cluster": "1", "degree": 1, "x": 457.4131274131272, "color": "Red", "node_shape": "dot", "node_label": "PIP5K1A", "id": 10, "y": 72.121684867395, "border_width": 0, "title": 10}, {"cluster": "4", "degree": 2, "x": 415.19305019305017, "color": "Blue", "node_shape": "dot", "node_label": "KPNA4", "id": 11, "y": 501.7628705148204, "border_width": 0, "title": 11}, {"cluster": "1", "degree": 2, "x": 216.6023166023166, "color": "Red", "node_shape": "dot", "node_label": "SEC31B", "id": 12, "y": 213.650546021841, "border_width": 0, "title": 12}, {"cluster": "2", "degree": 7, "x": 420.4054054054056, "color": "Yellow", "node_shape": "dot", "node_label": "BYSL", "id": 13, "y": 189.2199687987522, "border_width": 0, "title": 13}, {"cluster": "4", "degree": 2, "x": 358.89961389961377, "color": "Blue", "node_shape": "dot", "node_label": "SNUPN", "id": 14, "y": 355.179407176287, "border_width": 0, "title": 14}, {"cluster": "1", "degree": 2, "x": 205.6563706563708, "color": "Red", "node_shape": "dot", "node_label": "ECT2", "id": 15, "y": 157.207488299532, "border_width": 0, "title": 15}, {"cluster": "1", "degree": 2, "x": 457.4131274131272, "color": "Red", "node_shape": "dot", "node_label": "MYH11", "id": 16, "y": 440.2652106084246, "border_width": 0, "title": 16}, {"cluster": "2", "degree": 5, "x": 273.9382239382242, "color": "Yellow", "node_shape": "dot", "node_label": "EIF3E", "id": 17, "y": 329.0639625585024, "border_width": 0, "title": 17}, {"cluster": "2", "degree": 7, "x": 320.3281853281854, "color": "Yellow", "node_shape": "dot", "node_label": "IMP3", "id": 18, "y": 242.293291731669, "border_width": 0, "title": 18}, {"cluster": "1", "degree": 1, "x": 326.06177606177636, "color": "Red", "node_shape": "dot", "node_label": "SLC25A40", "id": 19, "y": 72.121684867395, "border_width": 0, "title": 19}, {"cluster": "1", "degree": 1, "x": 194.710424710425, "color": "Red", "node_shape": "dot", "node_label": "ITPR1", "id": 20, "y": 266.7238689547584, "border_width": 0, "title": 20}, {"cluster": "3", "degree": 5, "x": 106.6216216216218, "color": "Green", "node_shape": "dot", "node_label": "ITGB1", "id": 21, "y": 284.414976599064, "border_width": 0, "title": 21}, {"cluster": "1", "degree": 2, "x": 455.849420849421, "color": "Red", "node_shape": "dot", "node_label": "APOLD1", "id": 22, "y": 392.24648985959465, "border_width": 0, "title": 22}, {"cluster": "1", "degree": 2, "x": 295.8301158301158, "color": "Red", "node_shape": "dot", "node_label": "RARS", "id": 23, "y": 475.6474258970358, "border_width": 0, "title": 23}, {"cluster": "1", "degree": 1, "x": 249.4401544401546, "color": "Red", "node_shape": "dot", "node_label": "ATF2", "id": 24, "y": 425.94383775350997, "border_width": 0, "title": 24}, {"cluster": "1", "degree": 1, "x": 282.277992277992, "color": "Red", "node_shape": "dot", "node_label": "PTPN9", "id": 25, "y": 532.0904836193448, "border_width": 0, "title": 25}, {"cluster": "1", "degree": 1, "x": 260.3861003861004, "color": "Red", "node_shape": "dot", "node_label": "RTFDC1", "id": 26, "y": 284.414976599064, "border_width": 0, "title": 26}, {"cluster": "1", "degree": 1, "x": 347.953667953668, "color": "Red", "node_shape": "dot", "node_label": "DCP1A", "id": 27, "y": 532.0904836193448, "border_width": 0, "title": 27}, {"cluster": "1", "degree": 1, "x": 468.3590733590736, "color": "Red", "node_shape": "dot", "node_label": "PAPD4", "id": 28, "y": 319.79719188767524, "border_width": 0, "title": 28}, {"cluster": "2", "degree": 6, "x": 328.66795366795384, "color": "Yellow", "node_shape": "dot", "node_label": "POLR3B", "id": 29, "y": 126.03744149766, "border_width": 0, "title": 29}, {"cluster": "1", "degree": 3, "x": 543.9382239382242, "color": "Red", "node_shape": "dot", "node_label": "PRPF4", "id": 30, "y": 158.8923556942278, "border_width": 0, "title": 30}, {"cluster": "2", "degree": 6, "x": 375.057915057915, "color": "Yellow", "node_shape": "dot", "node_label": "NOB1", "id": 31, "y": 142.0436817472698, "border_width": 0, "title": 31}, {"cluster": "3", "degree": 4, "x": 52.41312741312744, "color": "Green", "node_shape": "dot", "node_label": "LAMA5", "id": 32, "y": 259.9843993759752, "border_width": 0, "title": 32}, {"cluster": "2", "degree": 7, "x": 334.9227799227798, "color": "Yellow", "node_shape": "dot", "node_label": "PES1", "id": 33, "y": 297.0514820592822, "border_width": 0, "title": 33}, {"cluster": "3", "degree": 4, "x": 64.4015444015442, "color": "Green", "node_shape": "dot", "node_label": "LAMC1", "id": 34, "y": 314.7425897035884, "border_width": 0, "title": 34}, {"cluster": "1", "degree": 1, "x": 391.7374517374518, "color": "Red", "node_shape": "dot", "node_label": "PITPNM1", "id": 35, "y": 72.121684867395, "border_width": 0, "title": 35}, {"cluster": "1", "degree": 1, "x": 435.5212355212356, "color": "Red", "node_shape": "dot", "node_label": "PABPC3", "id": 36, "y": 125.1950078003118, "border_width": 0, "title": 36}, {"cluster": "1", "degree": 2, "x": 516.8339768339766, "color": "Red", "node_shape": "dot", "node_label": "TNNT2", "id": 37, "y": 425.94383775350997, "border_width": 0, "title": 37}, {"cluster": "3", "degree": 3, "x": 157.18146718146718, "color": "Green", "node_shape": "dot", "node_label": "ILK", "id": 38, "y": 308.00312012480515, "border_width": 0, "title": 38}, {"cluster": "1", "degree": 2, "x": 184.8069498069498, "color": "Red", "node_shape": "dot", "node_label": "PSMA4", "id": 39, "y": 489.1263650546022, "border_width": 0, "title": 39}], [{"title": "test", "source": 31, "color": "black", "target": 13, "combined_score": 0.999}, {"title": "test", "source": 30, "color": "black", "target": 4, "combined_score": 0.998}, {"title": "test", "source": 18, "color": "black", "target": 13, "combined_score": 0.997}, {"title": "test", "source": 34, "color": "black", "target": 32, "combined_score": 0.995}, {"title": "test", "source": 30, "color": "black", "target": 0, "combined_score": 0.995}, {"title": "test", "source": 0, "color": "black", "target": 4, "combined_score": 0.994}, {"title": "test", "source": 2, "color": "black", "target": 32, "combined_score": 0.992}, {"title": "test", "source": 38, "color": "black", "target": 21, "combined_score": 0.99}, {"title": "test", "source": 33, "color": "black", "target": 18, "combined_score": 0.989}, {"title": "test", "source": 9, "color": "black", "target": 33, "combined_score": 0.986}, {"title": "test", "source": 9, "color": "black", "target": 13, "combined_score": 0.986}, {"title": "test", "source": 2, "color": "black", "target": 34, "combined_score": 0.985}, {"title": "test", "source": 9, "color": "black", "target": 18, "combined_score": 0.982}, {"title": "test", "source": 9, "color": "black", "target": 31, "combined_score": 0.98}, {"title": "test", "source": 21, "color": "black", "target": 34, "combined_score": 0.958}, {"title": "test", "source": 21, "color": "black", "target": 32, "combined_score": 0.958}, {"title": "test", "source": 18, "color": "black", "target": 31, "combined_score": 0.948}, {"title": "test", "source": 33, "color": "black", "target": 13, "combined_score": 0.936}, {"title": "test", "source": 14, "color": "black", "target": 7, "combined_score": 0.923}, {"title": "test", "source": 2, "color": "black", "target": 21, "combined_score": 0.922}, {"title": "test", "source": 33, "color": "black", "target": 31, "combined_score": 0.915}, {"title": "test", "source": 5, "color": "black", "target": 38, "combined_score": 0.911}, {"title": "test", "source": 15, "color": "black", "target": 6, "combined_score": 0.899}, {"title": "test", "source": 33, "color": "black", "target": 17, "combined_score": 0.808}, {"title": "test", "source": 7, "color": "black", "target": 11, "combined_score": 0.766}, {"title": "test", "source": 18, "color": "black", "target": 17, "combined_score": 0.763}, {"title": "test", "source": 18, "color": "black", "target": 29, "combined_score": 0.685}, {"title": "test", "source": 16, "color": "black", "target": 37, "combined_score": 0.645}, {"title": "test", "source": 33, "color": "black", "target": 29, "combined_score": 0.609}, {"title": "test", "source": 5, "color": "black", "target": 17, "combined_score": 0.521}, {"title": "test", "source": 9, "color": "black", "target": 29, "combined_score": 0.502}, {"title": "test", "source": 31, "color": "rgb(220,220,220)", "target": 29, "combined_score": 0.477}, {"title": "test", "source": 12, "color": "rgb(220,220,220)", "target": 8, "combined_score": 0.474}, {"title": "test", "source": 13, "color": "rgb(220,220,220)", "target": 29, "combined_score": 0.469}, {"title": "test", "source": 5, "color": "rgb(220,220,220)", "target": 39, "combined_score": 0.449}, {"title": "test", "source": 23, "color": "rgb(220,220,220)", "target": 17, "combined_score": 0.424}, {"title": "test", "source": 9, "color": "rgb(220,220,220)", "target": 22, "combined_score": 0.42}, {"title": "test", "source": 9, "color": "rgb(220,220,220)", "target": 4, "combined_score": 0.418}, {"title": "test", "source": 13, "color": "rgb(220,220,220)", "target": 4, "combined_score": 0.41}]);
+        }
+      
+        </script>
+      
+          </head>
+          <body onload="setUpFrame();">
+            
+  <div id="mynetwork0"></div>
+          </body>
+          </html>
+        
